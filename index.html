@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vivica's Brain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --header-height: 72px;
+            --padding-base: 1.5rem;
+            --border-radius-base: 1.25rem;
+            --transition-speed: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* THEME DEFINITIONS */
+        :root, [data-theme="amoled-dark"] {
+            --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-tertiary: #141414;
+            --bg-hover: #1f1f1f; --bg-active: #2a2a2a; --text-primary: #ffffff;
+            --text-secondary: #b3b3b3; --text-muted: #71717a; --accent-primary: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.15); --border: #27272a; --border-light: #3f3f46;
+            --card-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        [data-theme="amoled-light"] {
+            --bg-primary: #fafafa; --bg-secondary: #ffffff; --bg-tertiary: #f4f4f5;
+            --bg-hover: #e4e4e7; --bg-active: #d4d4d8; --text-primary: #09090b;
+            --text-secondary: #3f3f46; --text-muted: #71717a; --accent-primary: #09090b;
+            --accent-glow: rgba(0, 0, 0, 0.05); --border: #e4e4e7; --border-light: #d4d4d8;
+            --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        [data-theme="blue-dark"] {
+            --bg-primary: #020617; --bg-secondary: #0f172a; --bg-tertiary: #1e293b;
+            --bg-hover: #334155; --bg-active: #475569; --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1; --text-muted: #94a3b8; --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.2); --border: #1e293b; --border-light: #334155;
+            --card-shadow: 0 20px 40px -15px rgba(0,0,0,0.7);
+        }
+
+        [data-theme="blue-light"] {
+            --bg-primary: #f8fafc; --bg-secondary: #ffffff; --bg-tertiary: #f1f5f9;
+            --bg-hover: #e2e8f0; --bg-active: #cbd5e1; --text-primary: #0f172a;
+            --text-secondary: #334155; --text-muted: #64748b; --accent-primary: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.1); --border: #e2e8f0; --border-light: #cbd5e1;
+            --card-shadow: 0 10px 20px -5px rgba(0,0,0,0.04);
+        }
+
+        [data-theme="red-dark"] {
+            --bg-primary: #0c0a09; --bg-secondary: #1c1917; --bg-tertiary: #292524;
+            --bg-hover: #44403c; --bg-active: #57534e; --text-primary: #fafaf9;
+            --text-secondary: #d6d3d1; --text-muted: #a8a29e; --accent-primary: #ef4444;
+            --accent-glow: rgba(239, 68, 68, 0.2); --border: #292524; --border-light: #44403c;
+            --card-shadow: 0 20px 40px -20px rgba(0,0,0,0.8);
+        }
+
+        [data-theme="red-light"] {
+            --bg-primary: #fffafb; --bg-secondary: #ffffff; --bg-tertiary: #fef2f2;
+            --bg-hover: #fee2e2; --bg-active: #fecaca; --text-primary: #450a0a;
+            --text-secondary: #7f1d1d; --text-muted: #b91c1c; --accent-primary: #dc2626;
+            --accent-glow: rgba(220, 38, 38, 0.08); --border: #fee2e2; --border-light: #fecaca;
+            --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* MODERN SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--border-light); 
+            border-radius: 100px; 
+            border: 2px solid var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* MARKDOWN STYLING */
+        .markdown-body { line-height: 1.6; }
+        .markdown-body pre { 
+            background: var(--bg-tertiary); 
+            border: 1px solid var(--border); 
+            border-radius: 1rem; 
+            padding: 1.25rem; 
+            margin: 1rem 0;
+            overflow-x: auto; 
+            font-family: 'Fira Code', monospace; 
+            font-size: 0.85rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .markdown-body code { 
+            font-family: 'Fira Code', monospace; 
+            background: var(--bg-hover); 
+            padding: 0.2rem 0.45rem; 
+            border-radius: 0.5rem; 
+            font-size: 0.9em;
+        }
+        .markdown-body p { margin-bottom: 1rem; }
+        .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* 3D TACTILE BUTTONS */
+        .btn-tactile {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-tactile:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-tactile:active { transform: translateY(1px); }
+
+        /* MASK FOR GRADIENT BACKGROUNDS */
+        .glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(var(--bg-secondary-rgb), 0.7);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "marked": "https://esm.sh/marked@^15.0.0"
+  }
+}
+</script>
+</head>
+<body class="overflow-hidden">
+    <div id="root"></div>
+</body>
+</html>

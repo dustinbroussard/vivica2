@@ -1,0 +1,5 @@
+{
+  "name": "Vivica's Brain - AI Chat Assistant",
+  "description": "A feature-rich AI chat application powered by Gemini API, featuring AI profiles, conversation persistence, personalized memory, and a polished responsive UI.",
+  "requestFramePermissions": []
+}
