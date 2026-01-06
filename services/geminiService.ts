@@ -1,6 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { Message, AIProfile, Role, UserMemory } from "../types";
+import { Message, AIProfile, Role } from "../types";
 
 export class GeminiService {
   private ai: GoogleGenAI;
