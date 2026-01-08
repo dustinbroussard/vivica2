@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vivica icon">
+  <rect width="256" height="256" rx="56" fill="#0a0a0a"/>
+  <circle cx="128" cy="128" r="76" fill="#ffffff"/>
+  <path d="M92 124c6 10 16 17 28 19 7 2 17 2 24 0 12-2 22-9 28-19" fill="none" stroke="#0a0a0a" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="128" cy="102" r="10" fill="#0a0a0a"/>
+</svg>

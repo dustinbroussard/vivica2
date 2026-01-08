@@ -2,8 +2,9 @@ const CACHE_NAME = 'vivica-v4';
 const ASSETS = [
   './',
   './index.html',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap'
+  './manifest.webmanifest',
+  './icon.svg',
+  './favicon.svg'
 ];
 
 self.addEventListener('install', (event) => {

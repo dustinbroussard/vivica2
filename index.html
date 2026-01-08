@@ -7,7 +7,9 @@
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1698/1698535.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -214,6 +216,7 @@
 </head>
 <body class="overflow-hidden">
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
     <script>
         // Use a strictly relative path for Service Worker registration
         // This avoids origin mismatch errors in complex sandbox/iframe environments

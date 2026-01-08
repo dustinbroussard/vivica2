@@ -4,9 +4,11 @@ import { Message, AIProfile, Role, UserMemory } from "../types";
 
 export class GeminiService {
   private ai: GoogleGenAI;
+  private apiKey: string | undefined;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    this.ai = new GoogleGenAI({ apiKey: this.apiKey || '' });
   }
 
   private buildSystemInstruction(profile: AIProfile, useMemory: boolean): string {
@@ -35,6 +37,9 @@ export class GeminiService {
     const isGeminiModel = profile.model.includes('gemini');
 
     if (isGeminiModel) {
+      if (!this.apiKey) {
+        throw new Error("Gemini API key missing. Set VITE_GEMINI_API_KEY in your environment.");
+      }
       const contents = history.map(msg => ({
         role: msg.role === Role.USER ? 'user' : 'model',
         parts: [{ text: msg.content }]
