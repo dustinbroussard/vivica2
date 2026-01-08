@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vivica's Brain</title>
-    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1698/1698535.png">
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,28 +72,114 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         /* MARKDOWN RENDERING */
-        .markdown-body { font-size: 0.95rem; line-height: 1.6; }
-        .markdown-body p { margin-bottom: 1rem; }
+        .markdown-body { 
+            font-size: 0.95rem; 
+            line-height: 1.7; 
+            color: var(--text-secondary);
+        }
+        .markdown-body p { margin-bottom: 1.25rem; }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        
+        /* Typography */
+        .markdown-body strong { color: var(--text-primary); font-weight: 700; }
+        .markdown-body em { font-style: italic; }
+        
+        /* Links */
+        .markdown-body a { 
+            color: var(--accent-primary); 
+            text-decoration: underline; 
+            text-underline-offset: 4px; 
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .markdown-body a:hover { opacity: 0.7; }
+
+        /* Headings */
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, 
+        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            font-weight: 800; 
+            margin-top: 2rem; 
+            margin-bottom: 1rem; 
+            color: var(--text-primary);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        .markdown-body h1 { font-size: 2rem; }
+        .markdown-body h2 { font-size: 1.5rem; }
+        .markdown-body h3 { font-size: 1.25rem; }
+        .markdown-body h1:first-child, .markdown-body h2:first-child, .markdown-body h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Lists */
+        .markdown-body ul { list-style-type: disc; margin-bottom: 1.25rem; padding-left: 1.5rem; }
+        .markdown-body ol { list-style-type: decimal; margin-bottom: 1.25rem; padding-left: 1.5rem; }
+        .markdown-body li { margin-bottom: 0.5rem; }
+        .markdown-body li > ul, .markdown-body li > ol { margin-top: 0.5rem; margin-bottom: 0; }
+
+        /* Code */
         .markdown-body pre { 
             background: #000; 
             border: 1px solid var(--border); 
-            border-radius: 1rem; 
+            border-radius: 1.25rem; 
             padding: 1.25rem; 
-            margin: 1.5rem 0;
+            margin: 1.75rem 0;
             overflow-x: auto; 
             font-family: 'Fira Code', monospace; 
             font-size: 0.85rem;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+            line-height: 1.5;
         }
         .markdown-body code { 
             font-family: 'Fira Code', monospace; 
-            background: var(--bg-hover); 
-            padding: 0.15rem 0.4rem; 
-            border-radius: 0.4rem; 
+            background: var(--bg-tertiary); 
+            padding: 0.2rem 0.45rem; 
+            border-radius: 0.5rem; 
             font-size: 0.9em;
+            color: var(--text-primary);
+            font-weight: 500;
         }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-            font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary);
+        .markdown-body pre code { 
+            background: transparent; 
+            padding: 0; 
+            border-radius: 0; 
+            color: inherit;
+        }
+
+        /* Blockquotes */
+        .markdown-body blockquote {
+            border-left: 4px solid var(--border-light);
+            padding-left: 1.5rem;
+            margin: 1.75rem 0;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        /* Tables */
+        .markdown-body table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.75rem 0;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        .markdown-body th {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 700;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .markdown-body td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .markdown-body tr:last-child td {
+            border-bottom: none;
         }
 
         /* UI MOTION */
@@ -131,11 +215,19 @@
 <body class="overflow-hidden">
     <div id="root"></div>
     <script>
+        // Use a strictly relative path for Service Worker registration
+        // This avoids origin mismatch errors in complex sandbox/iframe environments
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Vivica SW active'))
-                .catch(err => console.error('SW Error', err));
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    console.log('Vivica SW registered successfully');
+                })
+                .catch(err => {
+                    // In some sandboxes/iframes, Service Worker registration is restricted by policy.
+                    // We log a warning but ensure the main app remains fully functional.
+                    console.warn('Service Worker registration skipped or restricted by environment:', err.message);
+                });
             });
         }
     </script>

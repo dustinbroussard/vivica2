@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  Conversation, AIProfile, Role, Message, Settings 
+  Conversation, AIProfile, Role, Message, Settings, UserMemory 
 } from './types';
 import { 
   DEFAULT_PROFILES, STORAGE_KEYS, GEMINI_MODELS, DEFAULT_MEMORY 
@@ -11,7 +11,6 @@ import {
   SettingsIcon, BrainIcon, MoonIcon, SunIcon, XMarkIcon 
 } from './components/Icons';
 import { marked } from 'marked';
-import DOMPurify from 'dompurify';
 
 // --- Components ---
 
@@ -24,10 +23,15 @@ const MessageBubble: React.FC<{
   
   const contentHtml = useMemo(() => {
     try {
-      const raw = marked.parse(message.content) as string;
-      return { __html: DOMPurify.sanitize(raw) };
+      // Configure marked options for safer and more robust parsing
+      const rawHtml = marked.parse(message.content, {
+        breaks: true,
+        gfm: true,
+      }) as string;
+      return { __html: rawHtml };
     } catch (e) {
-      return { __html: DOMPurify.sanitize(message.content) };
+      console.error("Markdown parse error:", e);
+      return { __html: message.content };
     }
   }, [message.content]);
 
@@ -37,12 +41,12 @@ const MessageBubble: React.FC<{
         {isUser ? <UserIcon size={22} /> : <BotIcon size={22} />}
       </div>
       <div className={`flex-1 space-y-2 overflow-hidden ${isUser ? 'text-right' : 'text-left'}`}>
-        <div className={`flex items-center gap-2 mb-1 ${isUser ? 'justify-end' : 'justify-start'}`}>
+        <div className={`flex items-center gap-2 mb-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--text-muted)]">{isUser ? 'You' : profile.name}</span>
           <span className="text-[10px] text-[var(--text-muted)] opacity-30 font-bold">{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
         <div 
-          className={`markdown-body prose prose-invert prose-sm max-w-none prose-headings:font-black prose-p:leading-relaxed ${isUser ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] font-medium'}`}
+          className={`markdown-body max-w-none ${isUser ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] font-medium'}`}
           dangerouslySetInnerHTML={contentHtml}
         />
         {message.isError && (
@@ -264,7 +268,7 @@ const App: React.FC = () => {
         profileId: settings.activeProfileId,
         isMemoryEnabled: true
       };
-      setConversations(prev => [newConvo, ...prev]);
+      setConversations([newConvo, ...conversations]);
       setSettings(prev => ({ ...prev, activeConversationId: targetId }));
     }
 
@@ -310,8 +314,7 @@ const App: React.FC = () => {
         <div className="p-6">
           <button onClick={() => {
             const id = Date.now().toString();
-            const newConvo: Conversation = { id, title: 'New Stream', profileId: settings.activeProfileId, lastUpdated: Date.now(), messages: [], isMemoryEnabled: true };
-            setConversations(prev => [newConvo, ...prev]);
+            setConversations([{ id, title: 'New Stream', profileId: settings.activeProfileId, lastUpdated: Date.now(), messages: [], isMemoryEnabled: true }, ...conversations]);
             setSettings(prev => ({ ...prev, activeConversationId: id }));
             if (window.innerWidth <= 768) setIsSidebarOpen(false);
           }} className="w-full py-4 bg-[var(--accent-primary)] text-[var(--bg-primary)] rounded-[1.25rem] font-black text-sm uppercase tracking-widest shadow-2xl hover:scale-[1.02] active:scale-95 transition-all btn-tactile">
@@ -326,7 +329,7 @@ const App: React.FC = () => {
                 <p className={`text-sm font-bold truncate ${settings.activeConversationId === convo.id ? 'text-white' : 'text-[var(--text-secondary)]'}`}>{convo.title}</p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mt-1.5 opacity-60">{new Date(convo.lastUpdated).toLocaleDateString()}</p>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); setConversations(prev => prev.filter(c => c.id !== convo.id)); }} className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><TrashIcon size={16} /></button>
+              <button onClick={(e) => { e.stopPropagation(); setConversations(conversations.filter(c => c.id !== convo.id)); }} className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><TrashIcon size={16} /></button>
             </div>
           ))}
         </div>
@@ -404,7 +407,7 @@ const App: React.FC = () => {
 
       <Modal isOpen={isProfileManagerOpen} onClose={() => setIsProfileManagerOpen(false)} title="Repository">
         <div className="space-y-10">
-          <button onClick={() => setProfiles(prev => [...prev, { id: Date.now().toString(), name: 'New Unit', model: GEMINI_MODELS[0].id, temperature: 0.7, systemPrompt: 'Advanced Assistant', memory: { ...DEFAULT_MEMORY } }])} className="w-full py-6 border-4 border-dashed border-[var(--border)] rounded-[2.25rem] text-[var(--text-muted)] hover:text-white hover:border-[var(--accent-primary)] transition-all flex flex-col items-center gap-3 hover:bg-[var(--bg-hover)] group">
+          <button onClick={() => setProfiles([...profiles, { id: Date.now().toString(), name: 'New Unit', model: GEMINI_MODELS[0].id, temperature: 0.7, systemPrompt: 'Advanced Assistant', memory: { ...DEFAULT_MEMORY } }])} className="w-full py-6 border-4 border-dashed border-[var(--border)] rounded-[2.25rem] text-[var(--text-muted)] hover:text-white hover:border-[var(--accent-primary)] transition-all flex flex-col items-center gap-3 hover:bg-[var(--bg-hover)] group">
             <PlusIcon size={32} className="group-hover:rotate-90 transition-transform duration-500" />
             <span className="font-black text-xs uppercase tracking-[0.2em]">Deploy New Unit</span>
           </button>
@@ -416,7 +419,7 @@ const App: React.FC = () => {
                   <input value={p.name} onChange={(e) => setProfiles(profiles.map(pr => pr.id === p.id ? { ...pr, name: e.target.value } : pr))} className="flex-1 bg-transparent text-3xl font-black outline-none focus:text-[var(--accent-primary)] tracking-tighter" />
                   <div className="flex items-center gap-3">
                     <button onClick={() => { setIsProfileManagerOpen(false); setSettings(prev => ({ ...prev, activeProfileId: p.id })); setIsMemoryOpen(true); }} className="px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Cognition</button>
-                    {!p.isDefault && <button onClick={() => setProfiles(prev => prev.filter(pr => pr.id !== p.id))} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><TrashIcon size={20} /></button>}
+                    {!p.isDefault && <button onClick={() => setProfiles(profiles.filter(pr => pr.id !== p.id))} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><TrashIcon size={20} /></button>}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
